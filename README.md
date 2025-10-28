@@ -64,7 +64,7 @@ A beautiful web interface to:
 **Three commands. Zero dependencies. Zero configuration.**
 
 ```bash
-git clone https://github.com/yourusername/claude-config-editor.git
+git clone https://github.com/gagarinyury/claude-config-editor.git
 cd claude-config-editor
 python3 server.py
 ```
@@ -239,7 +239,7 @@ A: Yes! Python is cross-platform. Works on macOS, Linux, Windows.
 **Want to add a feature?** Fork + PR.
 
 ```bash
-git clone https://github.com/yourusername/claude-config-editor.git
+git clone https://github.com/gagarinyury/claude-config-editor.git
 cd claude-config-editor
 # Make your changes
 git commit -am "Add awesome feature"
@@ -291,8 +291,8 @@ It helps others discover the tool and validates my late-night coding session.
 If you found this useful, **star the repo**! It helps others discover it.
 
 <p align="center">
-  <a href="https://star-history.com/#yourusername/claude-config-editor&Date">
-    <img src="https://api.star-history.com/svg?repos=yourusername/claude-config-editor&type=Date" alt="Star History Chart">
+  <a href="https://star-history.com/#gagarinyury/claude-config-editor&Date">
+    <img src="https://api.star-history.com/svg?repos=gagarinyury/claude-config-editor&type=Date" alt="Star History Chart">
   </a>
 </p>
 
@@ -300,9 +300,9 @@ If you found this useful, **star the repo**! It helps others discover it.
 
 ## 💬 Support
 
-- 🐛 **Bugs:** [Open an issue](https://github.com/yourusername/claude-config-editor/issues)
-- 💡 **Ideas:** [Open an issue](https://github.com/yourusername/claude-config-editor/issues)
-- 💬 **Questions:** [Discussions](https://github.com/yourusername/claude-config-editor/discussions)
+- 🐛 **Bugs:** [Open an issue](https://github.com/gagarinyury/claude-config-editor/issues)
+- 💡 **Ideas:** [Open an issue](https://github.com/gagarinyury/claude-config-editor/issues)
+- 💬 **Questions:** [Discussions](https://github.com/gagarinyury/claude-config-editor/discussions)
 - ⭐ **Show love:** Star the repo!
 
 ---
@@ -313,7 +313,7 @@ If you found this useful, **star the repo**! It helps others discover it.
 </p>
 
 <p align="center">
-  <strong>If this saved you time, <a href="https://github.com/yourusername/claude-config-editor">⭐ star the repo</a>!</strong><br>
+  <strong>If this saved you time, <a href="https://github.com/gagarinyury/claude-config-editor">⭐ star the repo</a>!</strong><br>
   <sub>It takes 2 seconds and makes my day.</sub>
 </p>
 
