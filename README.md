@@ -59,6 +59,22 @@ A beautiful web interface to:
 
 ---
 
+## 📸 Screenshots
+
+### Overview Dashboard
+![Overview](screenshots/overview.png)
+*Quick stats and health analysis at a glance*
+
+### Project History Manager
+![Project History](screenshots/project-history.png)
+*See which projects are eating disk space, export or delete with one click*
+
+### MCP Servers
+![MCP Servers](screenshots/mcp-servers.png)
+*Visual management of MCP server configurations*
+
+---
+
 ## 🚄 Quick Start
 
 **Three commands. Zero dependencies. Zero configuration.**
