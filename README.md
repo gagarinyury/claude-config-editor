@@ -78,6 +78,12 @@ The tool automatically detects:
 
 If both exist, you'll be prompted to choose which one to edit.
 
+**Or specify directly:**
+```bash
+python3 server.py code     # Use Claude Code config
+python3 server.py desktop  # Use Claude Desktop config
+```
+
 ---
 
 ## 💡 Common Use Cases

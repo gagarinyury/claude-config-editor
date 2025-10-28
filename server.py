@@ -261,8 +261,19 @@ def main():
     print("🚀 Claude Config Editor")
     print("   Universal editor for Claude Code & Claude Desktop\n")
 
-    # Select config
-    ACTIVE_CONFIG = select_config()
+    # Check for command line arg
+    if len(sys.argv) > 1:
+        config_type = sys.argv[1].lower()
+        configs = detect_configs()
+        if config_type in configs:
+            ACTIVE_CONFIG = configs[config_type]
+        else:
+            print(f"❌ Unknown config type: {config_type}")
+            print(f"   Available: {', '.join(configs.keys())}")
+            sys.exit(1)
+    else:
+        # Select config interactively
+        ACTIVE_CONFIG = select_config()
 
     print(f"\n✅ Active config: {ACTIVE_CONFIG['name']}")
     print(f"📁 Path: {ACTIVE_CONFIG['path']}")
