@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Config Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #4ec9b0;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-path {
+            background: #252526;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-family: Monaco, monospace;
+            font-size: 12px;
+            color: #858585;
+        }
+
+        .top-controls {
+            background: #252526;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3e3e42;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: #252526;
+            border: none;
+            color: #858585;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .tab:hover {
+            background: #2d2d30;
+            color: #d4d4d4;
+        }
+
+        .tab.active {
+            background: #1e1e1e;
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: #252526;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .badge {
+            background: #0e639c;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        button.danger {
+            background: #c5302d;
+        }
+
+        button.danger:hover:not(:disabled) {
+            background: #e03e3a;
+        }
+
+        button.success {
+            background: #107c10;
+        }
+
+        button.success:hover:not(:disabled) {
+            background: #13a813;
+        }
+
+        button.small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #2d2d30;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            font-weight: 600;
+            color: #4ec9b0;
+            border-bottom: 1px solid #3e3e42;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #3e3e42;
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #2d2d30;
+            cursor: pointer;
+        }
+
+        tbody tr.selected {
+            background: #264f78;
+        }
+
+        td {
+            padding: 12px;
+        }
+
+        .size-bar {
+            height: 20px;
+            background: #3e3e42;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .size-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #107c10, #4ec9b0);
+            transition: width 0.3s;
+        }
+
+        .size-text {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 11px;
+            color: #d4d4d4;
+            font-weight: bold;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            color: #d4d4d4;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .mcp-server-card {
+            background: #2d2d30;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .mcp-server-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .mcp-server-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4ec9b0;
+        }
+
+        .mcp-server-info {
+            font-family: Monaco, monospace;
+            font-size: 12px;
+            color: #858585;
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .json-viewer {
+            background: #1e1e1e;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: Monaco, monospace;
+            font-size: 12px;
+            color: #d4d4d4;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .warning {
+            background: #5a4120;
+            border-left: 4px solid #ffd700;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .success-message {
+            background: #1a3d1a;
+            border-left: 4px solid #13a813;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #2d2d30;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #858585;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4ec9b0;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #858585;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Claude Config Editor</h1>
+        <p style="color: #858585; margin-bottom: 20px;">Web-based editor for Claude Code configuration</p>
+
+        <div class="config-path">
+            📁 Config: <span id="config-path">Loading...</span>
+        </div>
+
+        <div class="top-controls">
+            <button class="success" onclick="saveConfig()" id="save-btn" disabled>💾 Save Changes</button>
+            <button onclick="reloadConfig()">🔄 Reload</button>
+            <button onclick="createBackup()">📦 Backup</button>
+            <div style="flex: 1;"></div>
+            <div style="color: #858585; font-size: 12px;">
+                Last saved: <span id="last-save">never</span>
+            </div>
+        </div>
+
+        <div id="message-area"></div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="tab" onclick="switchTab('projects')">📁 Project History</button>
+            <button class="tab" onclick="switchTab('mcp')">🔌 MCP Servers</button>
+            <button class="tab" onclick="switchTab('raw')">📝 Raw JSON</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Config Size</div>
+                    <div class="stat-value" id="overview-size">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Projects</div>
+                    <div class="stat-value" id="overview-projects">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MCP Servers</div>
+                    <div class="stat-value" id="overview-mcp">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Startups</div>
+                    <div class="stat-value" id="overview-startups">-</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2>🔍 Quick Analysis</h2>
+                </div>
+                <div id="quick-analysis"></div>
+            </div>
+        </div>
+
+        <!-- Projects Tab -->
+        <div id="tab-projects" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>📁 Project History <span class="badge" id="projects-badge">0</span></h2>
+                    <div>
+                        <button onclick="selectAllProjects()">Select All</button>
+                        <button onclick="deselectAllProjects()">Deselect All</button>
+                        <button onclick="selectLargestProjects()">Top 10 Largest</button>
+                        <button class="danger" onclick="deleteSelectedProjects()">Delete Selected</button>
+                    </div>
+                </div>
+                <div class="search-box" style="margin-bottom: 15px;">
+                    <input type="text" id="projects-search" placeholder="Search projects..." onkeyup="filterProjects()">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">
+                                    <input type="checkbox" id="select-all-projects" onchange="toggleAllProjects(this.checked)">
+                                </th>
+                                <th onclick="sortProjects('path')">Project Path ↕</th>
+                                <th style="width: 100px;" onclick="sortProjects('history')">Messages ↕</th>
+                                <th style="width: 300px;" onclick="sortProjects('size')">Size ↕</th>
+                                <th style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projects-body">
+                            <tr><td colspan="5" class="no-data">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- MCP Tab -->
+        <div id="tab-mcp" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>🔌 MCP Servers <span class="badge" id="mcp-badge">0</span></h2>
+                    <button onclick="addMcpServer()">+ Add Server</button>
+                </div>
+                <div id="mcp-servers-list"></div>
+            </div>
+        </div>
+
+        <!-- Raw JSON Tab -->
+        <div id="tab-raw" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>📝 Raw JSON</h2>
+                    <button onclick="copyRawJson()">📋 Copy to Clipboard</button>
+                </div>
+                <div class="json-viewer" id="raw-json"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let config = null;
+        let projects = [];
+        let sortColumn = 'size';
+        let sortDirection = 'desc';
+        let hasChanges = false;
+
+        window.addEventListener('DOMContentLoaded', loadConfig);
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const data = await response.json();
+
+                document.getElementById('config-path').textContent = data.path;
+                config = data.config;
+
+                processConfig();
+                renderAllTabs();
+            } catch (error) {
+                showMessage('Error loading config: ' + error.message, 'error');
+            }
+        }
+
+        function processConfig() {
+            projects = [];
+
+            if (config.projects) {
+                for (const [path, data] of Object.entries(config.projects)) {
+                    const dataStr = JSON.stringify(data);
+                    projects.push({
+                        path: path,
+                        data: data,
+                        historyCount: data.history ? data.history.length : 0,
+                        size: dataStr.length,
+                        selected: false
+                    });
+                }
+            }
+        }
+
+        function renderAllTabs() {
+            renderOverview();
+            renderProjects();
+            renderMcpServers();
+            renderRawJson();
+        }
+
+        function renderOverview() {
+            const totalSize = JSON.stringify(config).length;
+            const projectsCount = config.projects ? Object.keys(config.projects).length : 0;
+            const mcpCount = config.mcpServers ? Object.keys(config.mcpServers).length : 0;
+
+            document.getElementById('overview-size').textContent = formatSize(totalSize);
+            document.getElementById('overview-projects').textContent = projectsCount;
+            document.getElementById('overview-mcp').textContent = mcpCount;
+            document.getElementById('overview-startups').textContent = config.numStartups || 0;
+
+            let analysis = '<div style="color: #858585;">';
+
+            if (totalSize > 5 * 1024 * 1024) {
+                analysis += '⚠️ Large config size (' + formatSize(totalSize) + '). Consider cleaning up old project history.<br><br>';
+            }
+
+            if (projectsCount > 20) {
+                analysis += '📁 Many projects (' + projectsCount + '). Remove unused ones in "Project History" tab.<br><br>';
+            }
+
+            if (mcpCount === 0) {
+                analysis += '🔌 No MCP servers configured.<br><br>';
+            } else {
+                analysis += '✅ ' + mcpCount + ' MCP server(s) active.<br><br>';
+            }
+
+            if (totalSize < 1024 * 1024 && projectsCount < 10) {
+                analysis = '<div style="color: #4ec9b0;">✅ Config looks healthy!</div>';
+            }
+
+            document.getElementById('quick-analysis').innerHTML = analysis;
+        }
+
+        function renderProjects() {
+            const tbody = document.getElementById('projects-body');
+            const searchTerm = document.getElementById('projects-search').value.toLowerCase();
+
+            document.getElementById('projects-badge').textContent = projects.length;
+
+            if (projects.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="no-data">No projects</td></tr>';
+                return;
+            }
+
+            const sorted = [...projects].sort((a, b) => {
+                let aVal, bVal;
+                if (sortColumn === 'path') {
+                    aVal = a.path;
+                    bVal = b.path;
+                } else if (sortColumn === 'history') {
+                    aVal = a.historyCount;
+                    bVal = b.historyCount;
+                } else {
+                    aVal = a.size;
+                    bVal = b.size;
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            const filtered = searchTerm
+                ? sorted.filter(p => p.path.toLowerCase().includes(searchTerm))
+                : sorted;
+
+            const maxSize = Math.max(...projects.map(p => p.size));
+
+            tbody.innerHTML = filtered.map(project => {
+                const percentage = (project.size / maxSize) * 100;
+
+                return `
+                    <tr class="${project.selected ? 'selected' : ''}" onclick="toggleProject('${escapeHtml(project.path)}')">
+                        <td>
+                            <input type="checkbox" ${project.selected ? 'checked' : ''}
+                                   onclick="event.stopPropagation(); toggleProject('${escapeHtml(project.path)}')">
+                        </td>
+                        <td style="font-family: 'Monaco', monospace; font-size: 12px;">
+                            ${escapeHtml(project.path)}
+                        </td>
+                        <td style="text-align: center; color: #858585;">
+                            ${project.historyCount}
+                        </td>
+                        <td>
+                            <div class="size-bar">
+                                <div class="size-bar-fill" style="width: ${percentage}%"></div>
+                                <span class="size-text">${formatSize(project.size)}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="small" onclick="event.stopPropagation(); exportProjectHistory('${escapeHtml(project.path)}')">
+                                    💾 Export
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderMcpServers() {
+            const container = document.getElementById('mcp-servers-list');
+            const mcpServers = config.mcpServers || {};
+            const serverNames = Object.keys(mcpServers);
+
+            document.getElementById('mcp-badge').textContent = serverNames.length;
+
+            if (serverNames.length === 0) {
+                container.innerHTML = '<div class="no-data">No MCP servers configured</div>';
+                return;
+            }
+
+            container.innerHTML = serverNames.map(name => {
+                const server = mcpServers[name];
+                return `
+                    <div class="mcp-server-card">
+                        <div class="mcp-server-header">
+                            <div class="mcp-server-name">🔌 ${escapeHtml(name)}</div>
+                            <button class="danger small" onclick="deleteMcpServer('${escapeHtml(name)}')">Delete</button>
+                        </div>
+                        <div class="mcp-server-info">
+                            <div><strong>Command:</strong> ${escapeHtml(server.command || 'N/A')}</div>
+                            ${server.args ? '<div><strong>Args:</strong> ' + JSON.stringify(server.args) + '</div>' : ''}
+                            ${server.env && Object.keys(server.env).length > 0 ? '<div><strong>Env:</strong> ' + JSON.stringify(server.env) + '</div>' : ''}
+                            ${server.cwd ? '<div><strong>CWD:</strong> ' + escapeHtml(server.cwd) + '</div>' : ''}
+                            ${server.type ? '<div><strong>Type:</strong> ' + escapeHtml(server.type) + '</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRawJson() {
+            const container = document.getElementById('raw-json');
+            container.textContent = JSON.stringify(config, null, 2);
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        function toggleProject(path) {
+            const project = projects.find(p => p.path === path);
+            if (project) {
+                project.selected = !project.selected;
+                markChanged();
+                renderProjects();
+            }
+        }
+
+        function toggleAllProjects(checked) {
+            const searchTerm = document.getElementById('projects-search').value.toLowerCase();
+            const filtered = searchTerm
+                ? projects.filter(p => p.path.toLowerCase().includes(searchTerm))
+                : projects;
+
+            filtered.forEach(p => p.selected = checked);
+            markChanged();
+            renderProjects();
+        }
+
+        function selectAllProjects() {
+            document.getElementById('select-all-projects').checked = true;
+            toggleAllProjects(true);
+        }
+
+        function deselectAllProjects() {
+            document.getElementById('select-all-projects').checked = false;
+            toggleAllProjects(false);
+        }
+
+        function selectLargestProjects() {
+            deselectAllProjects();
+            const sorted = [...projects].sort((a, b) => b.size - a.size);
+            sorted.slice(0, 10).forEach(p => p.selected = true);
+            markChanged();
+            renderProjects();
+        }
+
+        function sortProjects(column) {
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'desc';
+            }
+            renderProjects();
+        }
+
+        function filterProjects() {
+            renderProjects();
+        }
+
+        function deleteSelectedProjects() {
+            const selected = projects.filter(p => p.selected);
+            if (selected.length === 0) {
+                alert('No projects selected');
+                return;
+            }
+
+            if (!confirm(`Delete history for ${selected.length} project(s)?`)) return;
+
+            selected.forEach(project => {
+                delete config.projects[project.path];
+            });
+
+            projects = projects.filter(p => !p.selected);
+            markChanged();
+            renderAllTabs();
+
+            showMessage(`Deleted ${selected.length} project(s).`, 'success');
+        }
+
+        async function exportProjectHistory(path) {
+            try {
+                const response = await fetch(`/api/project?path=${encodeURIComponent(path)}`);
+                const blob = await response.blob();
+
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const projectName = path.split('/').pop() || 'project';
+                a.href = url;
+                a.download = `${projectName}-history.json`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                showMessage(`Exported history for: ${path}`, 'success');
+            } catch (error) {
+                showMessage('Export failed: ' + error.message, 'error');
+            }
+        }
+
+        function deleteMcpServer(name) {
+            if (!confirm(`Delete MCP server "${name}"?`)) return;
+
+            delete config.mcpServers[name];
+            markChanged();
+            renderAllTabs();
+
+            showMessage(`MCP server "${name}" deleted.`, 'success');
+        }
+
+        function addMcpServer() {
+            const name = prompt('MCP server name:');
+            if (!name) return;
+
+            const command = prompt('Command:');
+            if (!command) return;
+
+            if (!config.mcpServers) config.mcpServers = {};
+
+            config.mcpServers[name] = {
+                command: command,
+                args: []
+            };
+
+            markChanged();
+            renderAllTabs();
+            showMessage(`MCP server "${name}" added.`, 'success');
+        }
+
+        function markChanged() {
+            hasChanges = true;
+            document.getElementById('save-btn').disabled = false;
+        }
+
+        async function saveConfig() {
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = '⏳ Saving...';
+
+            try {
+                const response = await fetch('/api/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    hasChanges = false;
+                    const now = new Date().toLocaleTimeString();
+                    document.getElementById('last-save').textContent = now;
+                    showMessage('✅ Config saved! Restart Claude Code to apply changes.', 'success');
+                    saveBtn.textContent = '💾 Saved';
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (error) {
+                showMessage('Save error: ' + error.message, 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = '💾 Save Changes';
+            }
+        }
+
+        function reloadConfig() {
+            if (hasChanges && !confirm('Unsaved changes will be lost. Continue?')) {
+                return;
+            }
+            location.reload();
+        }
+
+        function createBackup() {
+            const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            a.href = url;
+            a.download = `claude-config-backup-${timestamp}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showMessage('Backup created and downloaded', 'success');
+        }
+
+        function copyRawJson() {
+            const text = JSON.stringify(config, null, 2);
+            navigator.clipboard.writeText(text);
+            showMessage('JSON copied to clipboard', 'success');
+        }
+
+        function showMessage(text, type) {
+            const messageArea = document.getElementById('message-area');
+            const className = type === 'success' ? 'success-message' : 'warning';
+            messageArea.innerHTML = `<div class="${className}">${text}</div>`;
+
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
