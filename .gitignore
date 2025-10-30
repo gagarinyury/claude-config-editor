@@ -20,10 +20,17 @@ wheels/
 .installed.cfg
 *.egg
 
+# PyInstaller
+*.spec
+
+# PyWebView
+.pywebview/
+
 # Virtual environments
 venv/
 ENV/
 env/
+.venv/
 
 # IDE
 .vscode/
@@ -39,3 +46,6 @@ env/
 # Test files
 test_*.json
 *.backup
+
+# Temp docs
+/docs

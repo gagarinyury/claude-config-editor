@@ -27,6 +27,7 @@
 **Claude Code stores EVERY conversation from EVERY project** in a single JSON file.
 
 After a few weeks of use:
+
 - 📁 87 projects with full chat histories
 - 💾 **17 MB** of JSON (yes, really)
 - 🐌 **Slow startup times** (Claude has to parse that mess)
@@ -37,6 +38,7 @@ After a few weeks of use:
 ## ✅ The Solution
 
 A beautiful web interface to:
+
 - 🔍 **See what's eating your disk** (sorted by size)
 - 🗑️ **Delete old projects in bulk** (top 10 biggest = 90% of bloat)
 - 💾 **Export before deleting** (keep important conversations)
@@ -49,11 +51,11 @@ A beautiful web interface to:
 
 ## 🎯 Why People Star This Repo
 
-> "My .claude.json was 23 MB. Deleted 50 old projects. Now it's 1.8 MB. Claude Code starts instantly now." - *Actual result*
+> "My .claude.json was 23 MB. Deleted 50 old projects. Now it's 1.8 MB. Claude Code starts instantly now." - _Actual result_
 
-> "Finally! I can see my MCP servers without opening VSCode." - *Reddit user*
+> "Finally! I can see my MCP servers without opening VSCode." - _Reddit user_
 
-> "I didn't even know this was a problem until I ran this tool." - *HN comment*
+> "I didn't even know this was a problem until I ran this tool." - _HN comment_
 
 **Translation:** This tool solves a problem you didn't know you had, in 30 seconds, with zero risk.
 
@@ -62,16 +64,19 @@ A beautiful web interface to:
 ## 📸 Screenshots
 
 ### Overview Dashboard
+
 ![Overview](screenshots/overview.png)
-*Quick stats and health analysis at a glance*
+_Quick stats and health analysis at a glance_
 
 ### Project History Manager
+
 ![Project History](screenshots/project-history.png)
-*See which projects are eating disk space, export or delete with one click*
+_See which projects are eating disk space, export or delete with one click_
 
 ### MCP Servers
+
 ![MCP Servers](screenshots/mcp-servers.png)
-*Visual management of MCP server configurations*
+_Visual management of MCP server configurations_
 
 ---
 
@@ -93,37 +98,109 @@ python3 server.py
 2. **You select** which one to edit
 3. **30 seconds later** your config is clean and fast
 
+### 🪟 Desktop Mode (NEW!)
+
+Want a native desktop app instead of a browser? Now you can!
+
+```bash
+# Install PyWebView (one time)
+pip install pywebview
+
+# Run as desktop app
+python3 server.py --desktop
+```
+
+**Or use the quick start script:**
+
+```bash
+# macOS/Linux
+./run_desktop.sh
+
+# Windows
+run_desktop.bat
+```
+
+**Benefits:**
+
+- ✅ Native window (no browser UI)
+- ✅ Better performance
+- ✅ No port conflicts (run multiple windows)
+- ✅ Desktop integration
+
+📖 [Full Desktop Mode Guide →](docs/guide-desktop-mode-user-manual.md)
+
+---
+
+## 📦 Download Pre-Built Executables
+
+**No Python? No problem.** Download standalone executables that just work.
+
+### 🔗 [Latest Release →](https://github.com/gagarinyury/claude-config-editor/releases/latest)
+
+**Available for:**
+
+| Platform       | File                                 | Size   | Installation                 |
+| -------------- | ------------------------------------ | ------ | ---------------------------- |
+| 🍎 **macOS**   | `ClaudeConfigEditor-macOS.zip`       | ~20 MB | Extract → Right-click → Open |
+| 🐧 **Linux**   | `ClaudeConfigEditor-x86_64.AppImage` | ~30 MB | `chmod +x` → Run             |
+| 🪟 **Windows** | `ClaudeConfigEditor-Windows.zip`     | ~15 MB | Extract → Run → "Run anyway" |
+
+**Quick Start:**
+
+```bash
+# macOS
+unzip ClaudeConfigEditor-macOS.zip
+./ClaudeConfigEditor --desktop
+
+# Linux
+chmod +x ClaudeConfigEditor-x86_64.AppImage
+./ClaudeConfigEditor-x86_64.AppImage --desktop
+
+# Windows
+# Extract ZIP, double-click ClaudeConfigEditor.exe
+```
+
+**First time setup:** See the [Desktop Mode User Guide](docs/guide-desktop-mode-user-manual.md) for platform-specific instructions (bypassing Gatekeeper on macOS, SmartScreen on Windows, etc.).
+
 ---
 
 ## ✨ Features That Make You Go "Finally!"
 
 ### 📊 Smart Analytics
+
 See **exactly** what's taking up space:
+
 - Config size (before/after)
 - Projects ranked by size (biggest first)
 - Instant health check ("Your config is bloated AF")
 
 ### 📁 Project History Manager
+
 The killer feature:
+
 - **Export individual project histories** before deletion (download as JSON)
 - **Bulk delete old projects** (select top 10 = 90% space saved)
 - **Search & filter** (find that old client project from 6 months ago)
 - **Sort by size/name/messages** (find the bloat faster)
 
 ### 🔌 MCP Server Management
+
 Because editing JSON manually is for masochists:
+
 - **Visual list** of all MCP servers
 - **See command, args, env, working directory** at a glance
 - **Add/remove servers** with one click
 - **No more typos** in JSON (you know what I'm talking about)
 
 ### 🎨 Beautiful Interface
+
 - Dark theme (because your eyes matter)
 - Real-time updates (see changes as you make them)
 - Responsive (works on your tiny laptop screen)
 - **No installation required** (Python stdlib only)
 
 ### 🔒 Safety First
+
 - **Auto-backup before every save** (undo button for real life)
 - **Non-destructive** (only changes what you tell it to)
 - **Local-only** (zero network requests, zero data collection)
@@ -134,18 +211,23 @@ Because editing JSON manually is for masochists:
 ## 💡 Real-World Use Cases
 
 ### "My Claude Code is slow"
+
 → Your config is probably huge. Click "Top 10 Largest", delete, save. Done in 30 seconds.
 
 ### "I want to backup my conversations"
+
 → Go to Project History, click "💾 Export" on any project. Downloads JSON. Keep forever.
 
 ### "I don't know which MCP servers I have"
+
 → Go to MCP Servers tab. See everything. No more `cat ~/.claude.json | grep mcpServers`.
 
 ### "I messed up my config"
+
 → Restore from `.claude.backup.json` (created automatically before every save).
 
 ### "I want to share my setup"
+
 → Export your config, share the JSON. Or just share this tool.
 
 ---
@@ -197,19 +279,21 @@ Remove: Find server card → Click "Delete" → Save
 
 ### Supported Configs
 
-| Config | Path | Auto-Detect |
-|--------|------|-------------|
-| Claude Code (macOS/Linux) | `~/.claude.json` | ✅ |
-| Claude Code (Windows) | `%USERPROFILE%\.claude.json` | ✅ |
-| Claude Desktop (macOS) | `~/Library/Application Support/Claude/claude_desktop_config.json` | ✅ |
-| Claude Desktop (Windows) | `%APPDATA%\Claude\claude_desktop_config.json` | ✅ |
-| Claude Desktop (Linux) | `~/.config/Claude/claude_desktop_config.json` | ✅ |
+| Config                    | Path                                                              | Auto-Detect |
+| ------------------------- | ----------------------------------------------------------------- | ----------- |
+| Claude Code (macOS/Linux) | `~/.claude.json`                                                  | ✅          |
+| Claude Code (Windows)     | `%USERPROFILE%\.claude.json`                                      | ✅          |
+| Claude Desktop (macOS)    | `~/Library/Application Support/Claude/claude_desktop_config.json` | ✅          |
+| Claude Desktop (Windows)  | `%APPDATA%\Claude\claude_desktop_config.json`                     | ✅          |
+| Claude Desktop (Linux)    | `~/.config/Claude/claude_desktop_config.json`                     | ✅          |
 
 ### Requirements
+
 - **Python 3.7+** (no pip install, no virtualenv, just works)
 - **Claude Code** or **Claude Desktop** (obviously)
 
 ### How It Actually Works
+
 1. Starts HTTP server on port 8765
 2. Loads config via REST API (`/api/config`)
 3. Web UI makes changes in memory

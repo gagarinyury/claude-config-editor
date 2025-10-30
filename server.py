@@ -10,8 +10,18 @@ import json
 import os
 import sys
 import platform
+import argparse
+import threading
+import time
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
+
+# Conditional import for PyWebView
+try:
+    import webview
+    WEBVIEW_AVAILABLE = True
+except ImportError:
+    WEBVIEW_AVAILABLE = False
 
 PORT = 8765
 
@@ -255,30 +265,142 @@ def select_config():
             print("\n\n👋 Cancelled")
             sys.exit(0)
 
-def main():
+def start_server_thread(port=0):
+    """
+    Start HTTP server in background thread and return the actual port used.
+
+    Args:
+        port: Port to use (0 = random available port)
+
+    Returns:
+        int: The actual port the server is listening on
+    """
+    class ServerThread(threading.Thread):
+        def __init__(self, port):
+            super().__init__(daemon=True)
+            self.port = port
+            self.httpd = None
+            self.ready = threading.Event()
+
+        def run(self):
+            with socketserver.TCPServer(("127.0.0.1", self.port), ClaudeConfigHandler) as httpd:
+                self.httpd = httpd
+                # If port was 0, get the actual assigned port
+                if self.port == 0:
+                    self.port = httpd.server_address[1]
+                self.ready.set()  # Signal that server is ready
+                httpd.serve_forever()
+
+    thread = ServerThread(port)
+    thread.start()
+    thread.ready.wait()  # Wait for server to be ready
+
+    return thread.port
+
+def run_desktop_mode():
+    """Run application in desktop window mode using PyWebView."""
     global ACTIVE_CONFIG
 
-    print("🚀 Claude Config Editor")
+    # Check if PyWebView is available
+    if not WEBVIEW_AVAILABLE:
+        print("❌ PyWebView not installed!")
+        print("\n   Desktop mode requires PyWebView.")
+        print("   Install with: pip install pywebview\n")
+        print("   Or use browser mode: python3 server.py")
+        sys.exit(1)
+
+    print("🚀 Claude Config Editor (Desktop Mode)")
     print("   Universal editor for Claude Code & Claude Desktop\n")
 
-    # Check for command line arg
-    if len(sys.argv) > 1:
-        config_type = sys.argv[1].lower()
-        configs = detect_configs()
-        if config_type in configs:
-            ACTIVE_CONFIG = configs[config_type]
-        else:
-            print(f"❌ Unknown config type: {config_type}")
-            print(f"   Available: {', '.join(configs.keys())}")
-            sys.exit(1)
-    else:
-        # Select config interactively
+    # Select config (interactive or from ACTIVE_CONFIG if already set)
+    if ACTIVE_CONFIG is None:
         ACTIVE_CONFIG = select_config()
 
     print(f"\n✅ Active config: {ACTIVE_CONFIG['name']}")
     print(f"📁 Path: {ACTIVE_CONFIG['path']}")
 
-    # Get file size
+    size = ACTIVE_CONFIG['path'].stat().st_size
+    size_mb = size / (1024 * 1024)
+    print(f"📊 Size: {size_mb:.2f} MB")
+    print(f"\n🪟 Opening desktop window...\n")
+
+    # Start server on random port (avoids conflicts)
+    port = start_server_thread(port=0)
+
+    # Create desktop window
+    webview.create_window(
+        title='Claude Config Editor',
+        url=f'http://127.0.0.1:{port}',
+        width=1400,
+        height=900,
+        resizable=True,
+        min_size=(1000, 700),
+        background_color='#1e1e1e'
+    )
+
+    # Start PyWebView event loop (blocks until window closes)
+    webview.start(debug=False)
+
+    print("\n👋 Window closed. Goodbye!")
+
+def main():
+    global ACTIVE_CONFIG
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Claude Config Editor - Edit Claude Code & Desktop configurations',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python3 server.py                    # Browser mode (interactive)
+  python3 server.py code               # Browser mode (Claude Code config)
+  python3 server.py desktop            # Browser mode (Claude Desktop config)
+  python3 server.py --desktop          # Desktop window mode (interactive)
+  python3 server.py --desktop code     # Desktop window mode (Claude Code config)
+        """
+    )
+
+    parser.add_argument(
+        '--desktop',
+        action='store_true',
+        help='Run in desktop window mode (requires pywebview)'
+    )
+
+    parser.add_argument(
+        'config_type',
+        nargs='?',
+        choices=['code', 'desktop'],
+        help='Config type to edit (code or desktop)'
+    )
+
+    args = parser.parse_args()
+
+    # Pre-select config if specified via argument
+    if args.config_type:
+        configs = detect_configs()
+        if args.config_type in configs:
+            ACTIVE_CONFIG = configs[args.config_type]
+        else:
+            print(f"❌ Config type '{args.config_type}' not found.")
+            print(f"   Available: {', '.join(configs.keys())}")
+            sys.exit(1)
+
+    # Route to appropriate mode
+    if args.desktop:
+        run_desktop_mode()
+        return
+
+    # Browser mode (original behavior)
+    print("🚀 Claude Config Editor")
+    print("   Universal editor for Claude Code & Claude Desktop\n")
+
+    # Interactive config selection if not already set
+    if ACTIVE_CONFIG is None:
+        ACTIVE_CONFIG = select_config()
+
+    print(f"\n✅ Active config: {ACTIVE_CONFIG['name']}")
+    print(f"📁 Path: {ACTIVE_CONFIG['path']}")
+
     size = ACTIVE_CONFIG['path'].stat().st_size
     size_mb = size / (1024 * 1024)
     print(f"📊 Size: {size_mb:.2f} MB")
@@ -293,9 +415,11 @@ def main():
     except KeyboardInterrupt:
         print("\n\n👋 Shutting down...")
     except OSError as e:
-        if e.errno == 48:
+        if e.errno == 48 or e.errno == 98:  # Port in use (macOS/Linux)
             print(f"\n❌ Port {PORT} is already in use.")
-            print(f"   Try closing any existing instances or use a different port.")
+            print(f"   Try:")
+            print(f"   1. Close any existing instances")
+            print(f"   2. Use desktop mode: python3 server.py --desktop")
             sys.exit(1)
         else:
             raise
