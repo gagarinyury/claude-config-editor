@@ -94,11 +94,23 @@ def build():
     result = subprocess.run(cmd)
 
     if result.returncode == 0:
-        exe_name = 'ClaudeConfigEditor.exe' if system == 'Windows' else 'ClaudeConfigEditor'
+        if system == 'Darwin':
+            exe_name = 'ClaudeConfigEditor.app'
+        elif system == 'Windows':
+            exe_name = 'ClaudeConfigEditor.exe'
+        else:  # Linux
+            exe_name = 'ClaudeConfigEditor'
+
         exe_path = Path('dist') / exe_name
 
         if exe_path.exists():
-            size_mb = exe_path.stat().st_size / (1024 * 1024)
+            # For .app bundles, calculate size of the directory
+            if system == 'Darwin' and exe_path.is_dir():
+                total_size = sum(f.stat().st_size for f in exe_path.glob('**/*') if f.is_file())
+                size_mb = total_size / (1024 * 1024)
+            else:
+                size_mb = exe_path.stat().st_size / (1024 * 1024)
+
             print("\n✅ Build successful!")
             print(f"📂 Output: {exe_path}")
             print(f"📊 Size: {size_mb:.1f} MB\n")
@@ -106,6 +118,8 @@ def build():
             print("🧪 Test the executable:")
             if system == 'Windows':
                 print(f"   .\\dist\\{exe_name} --help\n")
+            elif system == 'Darwin':
+                print(f"   ./dist/{exe_name}/Contents/MacOS/ClaudeConfigEditor --help\n")
             else:
                 print(f"   ./dist/{exe_name} --help\n")
         else:

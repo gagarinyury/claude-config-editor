@@ -52,11 +52,11 @@ case "$PLATFORM" in
         echo ""
         echo "📦 Creating macOS package..."
         cd dist
-        if [ ! -f "ClaudeConfigEditor" ]; then
-            echo "❌ Error: ClaudeConfigEditor executable not found in dist/"
+        if [ ! -d "ClaudeConfigEditor.app" ]; then
+            echo "❌ Error: ClaudeConfigEditor.app bundle not found in dist/"
             exit 1
         fi
-        zip -r "../$PACKAGES_DIR/ClaudeConfigEditor-macOS.zip" ClaudeConfigEditor
+        zip -r "../$PACKAGES_DIR/ClaudeConfigEditor-macOS.zip" "ClaudeConfigEditor.app"
         cd ..
 
         SIZE=$(du -h "$PACKAGES_DIR/ClaudeConfigEditor-macOS.zip" | cut -f1)
