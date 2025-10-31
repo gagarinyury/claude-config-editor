@@ -17,7 +17,7 @@ fi
 source venv/bin/activate
 
 # Install requirements if needed
-if ! python -c "import webview" 2>/dev/null; then
+if ! python3 -c "import webview" 2>/dev/null; then
     echo "📥 Installing PyWebView..."
     pip install -q -r requirements.txt
     echo ""
